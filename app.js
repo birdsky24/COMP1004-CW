@@ -9,6 +9,11 @@ const balls = [];
 const ballImage = new Image();
 ballImage.src = "Ball.jpg";
 
+const boxWidth = 960;
+const boxHeight = 800;
+const boxX = (canvas.width - boxWidth) / 2;
+const boxY = (canvas.height - boxHeight) / 2;
+
 class Ball {
     constructor(x, y, velocityX, velocityY) {
         this.x = x;
@@ -31,9 +36,9 @@ class Ball {
 
 canvas.addEventListener("click", (event) => {
     const startX = canvas.width / 2;
-    const startY = 50;
+    const startY = 100;
     const angle = Math.atan2(event.clientY - startY, event.clientX - startX);
-    const speed = 5;
+    const speed = 8;
     const velocityX = Math.cos(angle) * speed;
     const velocityY = Math.sin(angle) * speed;
     balls.push(new Ball(startX, startY, velocityX, velocityY));
@@ -41,6 +46,12 @@ canvas.addEventListener("click", (event) => {
 
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw the box
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+    
     balls.forEach(ball => {
         ball.update();
         ball.draw();
