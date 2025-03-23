@@ -14,6 +14,9 @@ const boxHeight = 800;
 const boxX = (canvas.width - boxWidth) / 2;
 const boxY = (canvas.height - boxHeight) / 2;
 
+const startX = canvas.width / 2;
+const startY = 100;
+
 class Ball {
     constructor(x, y, velocityX, velocityY) {
         this.x = x;
@@ -35,9 +38,16 @@ class Ball {
 }
 
 canvas.addEventListener("click", (event) => {
-    const startX = canvas.width / 2;
-    const startY = 100;
-    const angle = Math.atan2(event.clientY - startY, event.clientX - startX);
+    let angle = Math.atan2(event.clientY - startY, event.clientX - startX);
+    
+    // Ensure the ball doesn't fire upwards
+    if (angle < -1.57079) {
+        angle = 3.14159;
+    }
+    if (angle < 0) {
+        angle = 0;
+    }
+    
     const speed = 8;
     const velocityX = Math.cos(angle) * speed;
     const velocityY = Math.sin(angle) * speed;
@@ -52,11 +62,20 @@ function animate() {
     ctx.lineWidth = 2;
     ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
     
+    // Draw the starting point dot
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.arc(startX, startY, 5, 0, Math.PI * 2);
+    ctx.fill();
+    
     balls.forEach(ball => {
         ball.update();
         ball.draw();
     });
     requestAnimationFrame(animate);
 }
+
+animate();
+
 
 animate();
