@@ -550,7 +550,12 @@ export class Game extends Phaser.Scene {
 
     gameOver() {
         this.isGameOver = true;
-
+    
+        // Clear any existing balls
+        this.shotball.forEach(ball => ball.destroy());
+        this.shotball = [];
+        this.currentBall = null;
+    
         const gameOverText = this.add.text(
             this.game.config.width / 2,
             this.game.config.height / 2,
@@ -564,18 +569,33 @@ export class Game extends Phaser.Scene {
                 align: 'center'
             }
         ).setOrigin(0.5);
-
+    
         this.input.once('pointerdown', () => {
+            // Reset all game state variables
             this.score = 0;
             this.shots = 10;
             this.orangehit = 0;
+            this.tempScore = 0;
+            this.pegsDestroyedThisShot = 0;
             this.isGameOver = false;
+            this.isGameWon = false;
+            
+            // Reset UI
+            this.scoreText.setText('Score: 0');
+            this.shotsText.setText('shots: 10');
+            this.multText.setText('x1');
+            
+            // Restart the scene
             this.scene.restart();
         });
     }
 
     gameWin() {
         this.isGameWon = true;
+
+        this.shotball.forEach(ball => ball.destroy());
+        this.shotball = [];
+        this.currentBall = null;
 
         const gameWinText = this.add.text(
             this.game.config.width / 2,
@@ -595,7 +615,15 @@ export class Game extends Phaser.Scene {
             this.score = 0;
             this.shots = 10;
             this.orangehit = 0;
+            this.tempScore = 0;
+            this.pegsDestroyedThisShot = 0;
             this.isGameWon = false;
+            this.isGameOver = false;
+
+            this.scoreText.setText('Score: 0');
+            this.shotsText.setText('shots: 10');
+            this.multText.setText('x1');
+
             this.scene.restart();
         });
     }
