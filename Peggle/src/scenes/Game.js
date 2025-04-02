@@ -4,14 +4,14 @@ export class Game extends Phaser.Scene {
         this.isGameOver = false;
         this.isGameWon = false;
         this.score = 0;
-        this.lives = 10;
+        this.shots = 10;
         this.pegsDestroyedThisShot = 0; // Track pegs destroyed per shot
         this.basket = null;
         this.scoreText = null;
         this.basketSpeed = 300;
         this.basketDirection = 1;
         this.obstacles = [];
-        this.livesText = null;
+        this.shotsText = null;
         this.basketSprite = null;
         this.shotball = [];
         this.currentBall = null;
@@ -49,8 +49,8 @@ export class Game extends Phaser.Scene {
             stroke: '#000000', strokeThickness: 6
         });
 
-        // Create lives display
-        this.livesText = this.add.text(16, 50, 'Lives: 10', {
+        // Create shots display
+        this.shotsText = this.add.text(16, 50, 'shots: 10', {
             fontFamily: 'Arial Black', fontSize: 18, color: '#ffffff',
             stroke: '#000000', strokeThickness: 5
         });
@@ -340,8 +340,29 @@ export class Game extends Phaser.Scene {
             if (this.pegsDestroyedThisShot > 0) {
                 const finalScore = this.tempScore * this.pegsDestroyedThisShot;
                 if (finalScore >= 25000){
-                    this.lives++;
-                    this.livesText.setText('Lives: ' + this.lives);
+                    this.shots++;
+                    this.shotsText.setText('shots: ' + this.shots);
+
+                    const shotGainText = this.add.text(
+                        this.basket.x,
+                        this.basket.y - 30,
+                        '+1 shot',
+                        {
+                            fontFamily: 'Arial Black',
+                            fontSize: 24,
+                            color: '#00FF00',
+                            stroke: '#000000',
+                            strokeThickness: 4
+                        }
+                    ).setOrigin(0.5);
+                    
+                    this.tweens.add({
+                        targets: shotGainText,
+                        y: shotGainText.y - 50,
+                        alpha: 0,
+                        duration: 1000,
+                        onComplete: () => shotGainText.destroy()
+                    });
                 }
                 this.score += finalScore;
                 this.scoreText.setText('Score: ' + this.score);
@@ -410,14 +431,14 @@ export class Game extends Phaser.Scene {
                 this.shotball.splice(i, 1);
                 item.destroy();
                 this.currentBall = null;
-                this.lives--;
-                this.livesText.setText('Lives: ' + this.lives);
+                this.shots--;
+                this.shotsText.setText('shots: ' + this.shots);
 
                 if (this.orangehit >= 25) {
                     this.gameWin();
                 }
 
-                if (this.lives <= 0) {
+                if (this.shots <= 0) {
                     this.gameOver();
                 }
 
@@ -432,14 +453,64 @@ export class Game extends Phaser.Scene {
             if (this.pegsDestroyedThisShot > 0) {
                 const finalScore = this.tempScore * this.pegsDestroyedThisShot;
                 if (finalScore >= 25000){
-                    this.lives++;
-                    this.livesText.setText('Lives: ' + this.lives);
+                    this.shots++;
+                    this.shotsText.setText('shots: ' + this.shots);
+
+                    const shotGainText = this.add.text(
+                        this.basket.x,
+                        this.basket.y - 30,
+                        '+1 shot',
+                        {
+                            fontFamily: 'Arial Black',
+                            fontSize: 24,
+                            color: '#00FF00',
+                            stroke: '#000000',
+                            strokeThickness: 4
+                        }
+                    ).setOrigin(0.5);
+                    
+                    this.tweens.add({
+                        targets: shotGainText,
+                        y: shotGainText.y - 50,
+                        alpha: 0,
+                        duration: 1000,
+                        onComplete: () => shotGainText.destroy()
+                    });
                 }
                 this.score += finalScore;
                 this.scoreText.setText('Score: ' + this.score);
                 
                 // Show score popup
                 this.showScorePopup(finalScore, this.basket.x, this.basket.y - 50);
+            }
+
+            if (this.pegsDestroyedThisShot === 0) {
+                if (Math.random() > 0.5) { // 50% chance to gain a shot
+                    this.shots++;
+                    this.shotsText.setText('shots: ' + this.shots);
+                    
+                    // Add visual feedback for gaining a shot
+                    const shotGainText = this.add.text(
+                        this.basket.x,
+                        this.basket.y - 30,
+                        '+1 shot',
+                        {
+                            fontFamily: 'Arial Black',
+                            fontSize: 24,
+                            color: '#00FF00',
+                            stroke: '#000000',
+                            strokeThickness: 4
+                        }
+                    ).setOrigin(0.5);
+                    
+                    this.tweens.add({
+                        targets: shotGainText,
+                        y: shotGainText.y - 50,
+                        alpha: 0,
+                        duration: 1000,
+                        onComplete: () => shotGainText.destroy()
+                    });
+                }
             }
 
             // Reset temp score and counter
@@ -496,7 +567,7 @@ export class Game extends Phaser.Scene {
 
         this.input.once('pointerdown', () => {
             this.score = 0;
-            this.lives = 10;
+            this.shots = 10;
             this.orangehit = 0;
             this.isGameOver = false;
             this.scene.restart();
@@ -506,7 +577,7 @@ export class Game extends Phaser.Scene {
     gameWin() {
         this.isGameWon = true;
 
-        const gameOverText = this.add.text(
+        const gameWinText = this.add.text(
             this.game.config.width / 2,
             this.game.config.height / 2,
             'GAME WIN\n\nTap to restart',
@@ -522,7 +593,7 @@ export class Game extends Phaser.Scene {
 
         this.input.once('pointerdown', () => {
             this.score = 0;
-            this.lives = 10;
+            this.shots = 10;
             this.orangehit = 0;
             this.isGameWon = false;
             this.scene.restart();
