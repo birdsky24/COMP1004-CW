@@ -2,6 +2,7 @@ export class Game extends Phaser.Scene {
     constructor() {
         super('Game');
         this.isGameOver = false;
+        this.isGameWon = false;
         this.score = 0;
         this.lives = 10;
         this.pegsDestroyedThisShot = 0; // Track pegs destroyed per shot
@@ -241,6 +242,11 @@ export class Game extends Phaser.Scene {
             scoreToAdd *= mult;
                 this.tempScore += scoreToAdd;
             // Optionally, play a sound or animation here if needed
+
+            // Check if all orange pegs are cleared
+        const allOrangePegsCleared = !this.obstacles.some(peg => 
+            peg.originalColor === '0xE45837' && !peg.markedForDeletion
+        );
         }
     }
 
@@ -333,6 +339,10 @@ export class Game extends Phaser.Scene {
             // Calculate and add the final score
             if (this.pegsDestroyedThisShot > 0) {
                 const finalScore = this.tempScore * this.pegsDestroyedThisShot;
+                if (finalScore >= 25000){
+                    this.lives++;
+                    this.livesText.setText('Lives: ' + this.lives);
+                }
                 this.score += finalScore;
                 this.scoreText.setText('Score: ' + this.score);
                 
@@ -348,6 +358,10 @@ export class Game extends Phaser.Scene {
             this.obstacles.forEach(peg => {
                 peg.markedForDeletion = false;
             });
+
+            if (this.orangehit >= 25) {
+                this.gameWin();
+            }
         }
     }
 
@@ -399,6 +413,10 @@ export class Game extends Phaser.Scene {
                 this.lives--;
                 this.livesText.setText('Lives: ' + this.lives);
 
+                if (this.orangehit >= 25) {
+                    this.gameWin();
+                }
+
                 if (this.lives <= 0) {
                     this.gameOver();
                 }
@@ -406,9 +424,6 @@ export class Game extends Phaser.Scene {
             // delete the marked pegs
             this.obstacles.forEach(peg => {
                 if (peg.markedForDeletion) {
-                    //this.score = tempscore * mult * peghits;
-                    //tempscore = 0;
-                    //peghits = 0;
                     peg.destroy(); // Remove the peg from the game
                 }
             });
@@ -416,6 +431,10 @@ export class Game extends Phaser.Scene {
             // Calculate and add the final score
             if (this.pegsDestroyedThisShot > 0) {
                 const finalScore = this.tempScore * this.pegsDestroyedThisShot;
+                if (finalScore >= 25000){
+                    this.lives++;
+                    this.livesText.setText('Lives: ' + this.lives);
+                }
                 this.score += finalScore;
                 this.scoreText.setText('Score: ' + this.score);
                 
@@ -478,7 +497,34 @@ export class Game extends Phaser.Scene {
         this.input.once('pointerdown', () => {
             this.score = 0;
             this.lives = 10;
+            this.orangehit = 0;
             this.isGameOver = false;
+            this.scene.restart();
+        });
+    }
+
+    gameWin() {
+        this.isGameWon = true;
+
+        const gameOverText = this.add.text(
+            this.game.config.width / 2,
+            this.game.config.height / 2,
+            'GAME WIN\n\nTap to restart',
+            {
+                fontFamily: 'Arial Black',
+                fontSize: 40,
+                color: '#ffffff',
+                stroke: '#000000',
+                strokeThickness: 8,
+                align: 'center'
+            }
+        ).setOrigin(0.5);
+
+        this.input.once('pointerdown', () => {
+            this.score = 0;
+            this.lives = 10;
+            this.orangehit = 0;
+            this.isGameWon = false;
             this.scene.restart();
         });
     }
