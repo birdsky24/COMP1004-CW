@@ -4,7 +4,7 @@ export class Game extends Phaser.Scene {
         this.isGameOver = false;
         this.score = 0;
         this.lives = 10;
-        this.Mult = 1;
+        this.pegsDestroyedThisShot = 0; // Track pegs destroyed per shot
         this.basket = null;
         this.scoreText = null;
         this.basketSpeed = 300;
@@ -15,7 +15,7 @@ export class Game extends Phaser.Scene {
         this.shotball = [];
         this.currentBall = null;
         this.orangehit = 0;
-        this.scoretemp = 0;
+        this.tempScore = 0;
     }
 
     create() {
@@ -197,23 +197,49 @@ export class Game extends Phaser.Scene {
         if (!obstacle.markedForDeletion) {
             // Mark the peg for deletion
             obstacle.markedForDeletion = true;
+            this.pegsDestroyedThisShot++;
     
+            let scoreToAdd = 0; // Score to add based on peg colour
             // Check peg colour and change it based on colour
             if (obstacle.originalColor === '0xE45837') { // Orange peg
                 obstacle.setFillStyle(0xFEA350);
                 this.orangehit += 1;
-                this.score += 100;
+                scoreToAdd = 100;
                 this.scoreText.setText('Score: ' + this.score);
             } else if (obstacle.originalColor === '0xB714AB') { // Purple peg
                 obstacle.setFillStyle(0xDF74DC);
-                this.score += 500;
+                scoreToAdd = 500;
                 this.scoreText.setText('Score: ' + this.score);
             } else {
                 obstacle.setFillStyle(0x91E1FA); // Blue peg
-                this.score += 10;
+                scoreToAdd = 10;
                 this.scoreText.setText('Score: ' + this.score);
             }
+                
+            let mult = 1; // Multiplication used in calculations
+            if (this.orangehit >= 10){
+            mult = 2;
+            this.multText.setText('x2');
+            }
+            if (this.orangehit >= 15){
+            mult = 3;
+            this.multText.setText('x3');
+            }
+            if (this.orangehit >= 19){
+            mult = 5;
+            this.multText.setText('x5');
+            }
+            if (this.orangehit >= 22){
+            mult = 10;
+            this.multText.setText('x10');
+            }
+            if (this.orangehit >= 25){
+            mult = 10;
+            this.multText.setText('FEVER');
+        }
     
+            scoreToAdd *= mult;
+                this.tempScore += scoreToAdd;
             // Optionally, play a sound or animation here if needed
         }
     }
@@ -304,6 +330,20 @@ export class Game extends Phaser.Scene {
                 }
             });
 
+            // Calculate and add the final score
+            if (this.pegsDestroyedThisShot > 0) {
+                const finalScore = this.tempScore * this.pegsDestroyedThisShot;
+                this.score += finalScore;
+                this.scoreText.setText('Score: ' + this.score);
+                
+                // Show score popup
+                this.showScorePopup(finalScore, this.basket.x, this.basket.y - 50);
+            }
+
+            // Reset temp score and counter
+            this.tempScore = 0;
+            this.pegsDestroyedThisShot = 0;
+            
             // Reset peg deletion flags
             this.obstacles.forEach(peg => {
                 peg.markedForDeletion = false;
@@ -346,27 +386,6 @@ export class Game extends Phaser.Scene {
             this.basketSprite.x = this.basket.x;
         }
 
-        if (this.orangehit >= 10){
-            this.mult = 2;
-            this.multText.setText('x2');
-        }
-        if (this.orangehit >= 15){
-            this.mult = 3;
-            this.multText.setText('x3');
-        }
-        if (this.orangehit >= 19){
-            this.mult = 5;
-            this.multText.setText('x5');
-        }
-        if (this.orangehit >= 22){
-            this.mult = 10;
-            this.multText.setText('x10');
-        }
-        if (this.orangehit >= 25){
-            this.mult = 10;
-            this.multText.setText('FEVER');
-        }
-    
         // Check for items that have fallen off the bottom of the screen
         const bottomY = this.game.config.height + 30;
         for (let i = this.shotball.length - 1; i >= 0; i--) {
@@ -394,12 +413,45 @@ export class Game extends Phaser.Scene {
                 }
             });
 
+            // Calculate and add the final score
+            if (this.pegsDestroyedThisShot > 0) {
+                const finalScore = this.tempScore * this.pegsDestroyedThisShot;
+                this.score += finalScore;
+                this.scoreText.setText('Score: ' + this.score);
+                
+                // Show score popup
+                this.showScorePopup(finalScore, this.basket.x, this.basket.y - 50);
+            }
+
+            // Reset temp score and counter
+            this.tempScore = 0;
+            this.pegsDestroyedThisShot = 0;
+
             // Reset peg deletion flags
             this.obstacles.forEach(peg => {
                 peg.markedForDeletion = false;
             });
             }
         }
+    }
+
+    showScorePopup(score, x, y) {
+        const popup = this.add.text(x, y, '+' + score, {
+            fontFamily: 'Arial Black',
+            fontSize: 24,
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 4
+        }).setOrigin(0.5);
+
+        // Animate the popup
+        this.tweens.add({
+            targets: popup,
+            y: y - 50,
+            alpha: 0,
+            duration: 1000,
+            onComplete: () => popup.destroy()
+        });
     }
 
     onWorldBoundsCollision(body, up, down, left, right) {
