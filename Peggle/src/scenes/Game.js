@@ -312,6 +312,9 @@ export class Game extends Phaser.Scene {
     
         // Add overlap with basket
         this.physics.add.overlap(container, this.basket, this.collectItem, null, this);
+
+        this.shots--;
+        this.shotsText.setText('shots: ' + this.shots);
     }
     
     // Modify the collection logic to remove the current ball when it's collected
@@ -329,6 +332,28 @@ export class Game extends Phaser.Scene {
             // Clear the current ball reference
             this.currentBall = null;
 
+            this.shots++;
+            this.shotsText.setText('shots: ' + this.shots);
+            const shotGainText = this.add.text(
+                this.basket.x,
+                this.basket.y - 30,
+                '+1 shot',
+                {
+                    fontFamily: 'Arial Black',
+                    fontSize: 24,
+                    color: '#00FF00',
+                    stroke: '#000000',
+                    strokeThickness: 4
+                }
+            ).setOrigin(0.5);
+            this.tweens.add({
+                targets: shotGainText,
+                y: shotGainText.y - 50,
+                alpha: 0,
+                duration: 1000,
+                onComplete: () => shotGainText.destroy()
+            });
+
             // delete the marked pegs
             this.obstacles.forEach(peg => {
                 if (peg.markedForDeletion) {
@@ -340,9 +365,9 @@ export class Game extends Phaser.Scene {
             if (this.pegsDestroyedThisShot > 0) {
                 const finalScore = this.tempScore * this.pegsDestroyedThisShot;
                 if (finalScore >= 25000){
+
                     this.shots++;
                     this.shotsText.setText('shots: ' + this.shots);
-
                     const shotGainText = this.add.text(
                         this.basket.x,
                         this.basket.y - 30,
@@ -355,7 +380,6 @@ export class Game extends Phaser.Scene {
                             strokeThickness: 4
                         }
                     ).setOrigin(0.5);
-                    
                     this.tweens.add({
                         targets: shotGainText,
                         y: shotGainText.y - 50,
@@ -431,15 +455,9 @@ export class Game extends Phaser.Scene {
                 this.shotball.splice(i, 1);
                 item.destroy();
                 this.currentBall = null;
-                this.shots--;
-                this.shotsText.setText('shots: ' + this.shots);
 
                 if (this.orangehit >= 25) {
                     this.gameWin();
-                }
-
-                if (this.shots <= 0) {
-                    this.gameOver();
                 }
 
             // delete the marked pegs
@@ -482,6 +500,10 @@ export class Game extends Phaser.Scene {
                 
                 // Show score popup
                 this.showScorePopup(finalScore, this.basket.x, this.basket.y - 50);
+
+                if (this.shots === 0) {
+                    this.gameOver();
+                }
             }
 
             if (this.pegsDestroyedThisShot === 0) {
@@ -510,6 +532,9 @@ export class Game extends Phaser.Scene {
                         duration: 1000,
                         onComplete: () => shotGainText.destroy()
                     });
+                }
+                if (this.shots === 0) {
+                    this.gameOver();
                 }
             }
 
