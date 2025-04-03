@@ -21,7 +21,7 @@ export class Game extends Phaser.Scene {
 
     create() {
         // Set background
-        this.cameras.main.setBackgroundColor(0xeb3474); // Deep blue
+        this.cameras.main.setBackgroundColor(0xeb3474); // Pink
 
         // Background image if available
         if (this.textures.exists('background')) {
@@ -191,6 +191,43 @@ export class Game extends Phaser.Scene {
 
         // Initialize the target position
         this.targetBasketX = this.game.config.width / 2;
+    }
+
+    getRandomBluePeg() {
+        const bluePegs = this.obstacles.filter(peg => 
+            peg.active && // Is active (not destroyed)
+            !peg.markedForDeletion && // Not marked for deletion
+            peg.originalColor === '0x1B398F' // Is blue
+        );
+        return bluePegs.length > 0 ? Phaser.Utils.Array.GetRandom(bluePegs) : null;
+    }
+
+    getPurplePeg() {
+        return this.obstacles.find(peg => 
+            peg.active && // Is active (not destroyed)
+            !peg.markedForDeletion && // Not marked for deletion
+            peg.originalColor === '0xB714AB' // Is purple
+        );
+    }
+
+    updatePurplePeg() {
+        // Find current purple peg
+        const oldPurplePeg = this.getPurplePeg();
+        
+        // Find a random blue peg that's not marked for deletion
+        const newBluePeg = this.getRandomBluePeg();
+        
+        if (oldPurplePeg) {
+            // Change old purple peg back to blue
+            oldPurplePeg.setFillStyle(0x1B398F);
+            oldPurplePeg.originalColor = '0x1B398F';
+        }
+        
+        if (newBluePeg) {
+            // Change new blue peg to purple
+            newBluePeg.setFillStyle(0xB714AB);
+            newBluePeg.originalColor = '0xB714AB';
+        }
     }
 
     hitObstacle(ball, obstacle) {
@@ -404,6 +441,9 @@ export class Game extends Phaser.Scene {
                 peg.markedForDeletion = false;
             });
 
+            // Update purple peg after shot is processed
+            this.updatePurplePeg();
+
             if (this.orangehit >= 25) {
                 this.gameWin();
             }
@@ -546,6 +586,9 @@ export class Game extends Phaser.Scene {
             this.obstacles.forEach(peg => {
                 peg.markedForDeletion = false;
             });
+
+            // Update purple peg after shot is processed
+            this.updatePurplePeg();
             }
         }
     }
