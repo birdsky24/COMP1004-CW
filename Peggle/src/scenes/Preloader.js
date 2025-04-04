@@ -26,7 +26,10 @@ export class Preloader extends Phaser.Scene {
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
-        this.load.image('ball', 'ball.png');
+        this.load.image('ball', 'dball.png');
+        this.load.audio('peghitAudio', 'peghit_low.ogg');
+        this.load.audio('gainshotAudio', 'aah.ogg');
+        this.load.audio('missAudio', 'coin_freeball_denied.ogg');
     }
 
     create() {
