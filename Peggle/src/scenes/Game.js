@@ -17,6 +17,11 @@ export class Game extends Phaser.Scene {
         this.currentBall = null;
         this.orangehit = 0;
         this.tempScore = 0;
+        this.soundEffects = {
+            peghitAudio : null,
+            gainshotAudio : null,
+            missAudio : null
+        };
     }
 
     create() {
@@ -77,6 +82,10 @@ export class Game extends Phaser.Scene {
             delay: 2000,
             duration: 1000
         });
+
+        this.soundEffects.peghitAudio = this.sound.add('peghitAudio');
+        this.soundEffects.gainshotAudio = this.sound.add('gainshotAudio');
+        this.soundEffects.missAudio = this.sound.add('missAudio');
     }
 
     createObstacles() {
@@ -236,6 +245,7 @@ export class Game extends Phaser.Scene {
             // Mark the peg for deletion
             obstacle.markedForDeletion = true;
             this.pegsDestroyedThisShot++;
+            this.soundEffects.peghitAudio.play();
     
             let scoreToAdd = 0; // Score to add based on peg colour
             // Check peg colour and change it based on colour
@@ -369,6 +379,7 @@ export class Game extends Phaser.Scene {
             // Clear the current ball reference
             this.currentBall = null;
 
+            this.soundEffects.gainshotAudio.play();
             this.shots++;
             this.shotsText.setText('shots: ' + this.shots);
             const shotGainText = this.add.text(
@@ -402,13 +413,13 @@ export class Game extends Phaser.Scene {
             if (this.pegsDestroyedThisShot > 0) {
                 const finalScore = this.tempScore * this.pegsDestroyedThisShot;
                 if (finalScore >= 25000){
-
+                    this.soundEffects.gainshotAudio.play();
                     this.shots++;
                     this.shotsText.setText('shots: ' + this.shots);
                     const shotGainText = this.add.text(
                         this.basket.x,
                         this.basket.y - 30,
-                        '+1 shot',
+                        '+2 shots',
                         {
                             fontFamily: 'Arial Black',
                             fontSize: 24,
@@ -511,6 +522,7 @@ export class Game extends Phaser.Scene {
             if (this.pegsDestroyedThisShot > 0) {
                 const finalScore = this.tempScore * this.pegsDestroyedThisShot;
                 if (finalScore >= 25000){
+                    this.soundEffects.gainshotAudio.play();
                     this.shots++;
                     this.shotsText.setText('shots: ' + this.shots);
 
@@ -548,6 +560,7 @@ export class Game extends Phaser.Scene {
 
             if (this.pegsDestroyedThisShot === 0) {
                 if (Math.random() > 0.5) { // 50% chance to gain a shot
+                    this.soundEffects.gainshotAudio.play();
                     this.shots++;
                     this.shotsText.setText('shots: ' + this.shots);
                     
@@ -572,7 +585,9 @@ export class Game extends Phaser.Scene {
                         duration: 1000,
                         onComplete: () => shotGainText.destroy()
                     });
-                }
+                } else (
+                    this.soundEffects.missAudio.play()
+                )
                 if (this.shots === 0) {
                     this.gameOver();
                 }
