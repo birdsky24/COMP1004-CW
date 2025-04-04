@@ -455,7 +455,7 @@ export class Game extends Phaser.Scene {
             // Update purple peg after shot is processed
             this.updatePurplePeg();
 
-            if (this.orangehit >= 25) {
+            if (this.orangehit === 25) {
                 this.gameWin();
             }
         }
@@ -506,10 +506,6 @@ export class Game extends Phaser.Scene {
                 this.shotball.splice(i, 1);
                 item.destroy();
                 this.currentBall = null;
-
-                if (this.orangehit >= 25) {
-                    this.gameWin();
-                }
 
             // delete the marked pegs
             this.obstacles.forEach(peg => {
@@ -604,6 +600,10 @@ export class Game extends Phaser.Scene {
 
             // Update purple peg after shot is processed
             this.updatePurplePeg();
+            }
+
+            if (this.orangehit === 25) {
+                this.gameWin();
             }
         }
     }
