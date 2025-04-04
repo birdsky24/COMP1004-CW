@@ -6,13 +6,13 @@ export class Game extends Phaser.Scene {
         this.score = 0;
         this.shots = 10;
         this.pegsDestroyedThisShot = 0; // Track pegs destroyed per shot
-        this.basket = null;
+        this.bucket = null;
         this.scoreText = null;
-        this.basketSpeed = 300;
-        this.basketDirection = 1;
+        this.bucketSpeed = 300;
+        this.bucketDirection = 1;
         this.obstacles = [];
         this.shotsText = null;
-        this.basketSprite = null;
+        this.bucketSprite = null;
         this.shotball = [];
         this.currentBall = null;
         this.orangehit = 0;
@@ -26,14 +26,7 @@ export class Game extends Phaser.Scene {
 
     create() {
         // Set background
-        this.cameras.main.setBackgroundColor(0xeb3474); // Pink
-
-        // Background image if available
-        if (this.textures.exists('background')) {
-            this.add.image(this.game.config.width / 2, this.game.config.height / 2, 'background')
-                .setDisplaySize(this.game.config.width, this.game.config.height)
-                .setAlpha(0.2);
-        }
+        this.cameras.main.setBackgroundcolour(0xeb3474); // Pink
 
         // Set up physics
         this.physics.world.setBounds(0, 0, this.game.config.width, this.game.config.height);
@@ -45,23 +38,23 @@ export class Game extends Phaser.Scene {
         // Create obstacles (pegs)
         this.createObstacles();
 
-        // Create the player's basket
-        this.createBasket();
+        // Create the player's bucket
+        this.createbucket();
 
         // Create score display
         this.scoreText = this.add.text(16, 16, 'Score: 0', {
-            fontFamily: 'Arial Black', fontSize: 24, color: '#ffffff',
+            fontFamily: 'Arial Black', fontSize: 24, colour: '#ffffff',
             stroke: '#000000', strokeThickness: 6
         });
 
         // Create shots display
         this.shotsText = this.add.text(16, 50, 'shots: 10', {
-            fontFamily: 'Arial Black', fontSize: 18, color: '#ffffff',
+            fontFamily: 'Arial Black', fontSize: 18, colour: '#ffffff',
             stroke: '#000000', strokeThickness: 5
         });
 
         this.multText = this.add.text(16, 84, 'x1', {
-            fontFamily: 'Arial Black', fontSize: 18, color: '#ffffff',
+            fontFamily: 'Arial Black', fontSize: 18, colour: '#ffffff',
             stroke: '#000000', strokeThickness: 5
         });
 
@@ -70,7 +63,7 @@ export class Game extends Phaser.Scene {
 
         // Tutorial text
         const tutorialText = this.add.text(this.game.config.width / 2, 650, 'Hit all Orange Pegs', {
-            fontFamily: 'Arial Black', fontSize: 18, color: '#ffffff',
+            fontFamily: 'Arial Black', fontSize: 18, colour: '#ffffff',
             stroke: '#000000', strokeThickness: 5,
             align: 'center'
         }).setOrigin(0.5);
@@ -90,9 +83,9 @@ export class Game extends Phaser.Scene {
 
     createObstacles() {
         const pegRadius = 8;
-        const pegColor = '0x1B398F'; // blue colour
-        const orangeColor = '0xE45837'; // Orange colour
-        const purpleColor = '0xB714AB'; // Purple color
+        const pegcolour = '0x1B398F'; // blue colour
+        const orangecolour = '0xE45837'; // Orange colour
+        const purplecolour = '0xB714AB'; // Purple colour
         const startX = 80;
         const startY = 170;
         const cols = 12;
@@ -127,7 +120,7 @@ export class Game extends Phaser.Scene {
         purplePegIndex = Math.floor(Math.random() * allPegs.length);
     }
 
-    // Now create the obstacles
+    // Create the obstacles
     for (let row = 0; row < rows; row++) {
         const offsetX = (row % 2 === 0) ? 0 : xSpacing / 2;
         for (let col = 0; col < cols; col++) {
@@ -136,18 +129,18 @@ export class Game extends Phaser.Scene {
 
             // Check if the current peg should be orange or purple
             const index = allPegs.findIndex(peg => peg.x === x && peg.y === y);
-            let color = pegColor; // Default to blue
+            let colour = pegcolour; // Default to blue
 
             if (orangePegs.has(index)) {
-                color = orangeColor;
+                colour = orangecolour;
             } else if (index === purplePegIndex) {
-                color = purpleColor;
+                colour = purplecolour;
             }
 
-            const peg = this.add.circle(x, y, pegRadius, color);
+            const peg = this.add.circle(x, y, pegRadius, colour);
 
-            // Store the color on the peg
-            peg.originalColor = color;
+            // Store the colour on the peg
+            peg.originalcolour = colour;
 
             this.physics.add.existing(peg, true);
             peg.body.setCircle(pegRadius + 2);
@@ -157,65 +150,65 @@ export class Game extends Phaser.Scene {
     }
 }
 
-    createBasket() {
-        const basketY = this.game.config.height - 10; // Position at the very bottom
+    createbucket() {
+        const bucketY = this.game.config.height - 10; // Position at the very bottom
 
-        // Multiplied all the numbers by 1.3
-        // Create a graphics object for the basket visual
-        this.basketSprite = this.add.graphics();
-        this.basketSprite.x = this.game.config.width / 2;
-        this.basketSprite.y = basketY;
+        // Multiplied all the numbers by 1.5
+        // Create a graphics object for the bucket visual
+        this.bucketSprite = this.add.graphics();
+        this.bucketSprite.x = this.game.config.width / 2;
+        this.bucketSprite.y = bucketY;
 
-        // Main basket body
-        this.basketSprite.fillStyle(0xD2691E, 1); // Lighter brown
-        this.basketSprite.fillRect(-90, -23, 180, 45);
+        // Main bucket body
+        this.bucketSprite.fillStyle(0xD2691E, 1); // Lighter brown
+        this.bucketSprite.fillRect(-90, -23, 180, 45);
 
-        // Basket sides (raised)
-        this.basketSprite.fillStyle(0x8B4513, 1); // Darker brown
-        this.basketSprite.fillRect(-90, -23, 15, 45); // Left side
-        this.basketSprite.fillRect(75, -23, 15, 45);  // Right side
+        // bucket sides (raised)
+        this.bucketSprite.fillStyle(0x8B4513, 1); // Darker brown
+        this.bucketSprite.fillRect(-90, -23, 15, 45); // Left side
+        this.bucketSprite.fillRect(75, -23, 15, 45);  // Right side
 
-        // Basket detail lines
-        this.basketSprite.lineStyle(2, 0x654321, 1);
-        this.basketSprite.strokeRect(-90, -23, 180, 45);
+        // bucket detail lines
+        this.bucketSprite.lineStyle(2, 0x654321, 1);
+        this.bucketSprite.strokeRect(-90, -23, 180, 45);
 
-        // Basket rim
-        this.basketSprite.lineStyle(3, 0x654321, 1);
-        this.basketSprite.strokeRect(-90, -23, 180, 8);
+        // bucket rim
+        this.bucketSprite.lineStyle(3, 0x654321, 1);
+        this.bucketSprite.strokeRect(-90, -23, 180, 8);
 
         // Now create the physics body at the same position - make it match the visual size
-        this.basket = this.physics.add.existing(
+        this.bucket = this.physics.add.existing(
             this.add.rectangle(
                 this.game.config.width / 2,
-                basketY,
-                188, // Width matches the basket visual width
-                60,  // Height matches the basket visual height
+                bucketY,
+                188, // Width matches the bucket visual width
+                60,  // Height matches the bucket visual height
                 0x000000
             ),
             true  // isStatic = true
         );
 
         // Make the physics body invisible
-        this.basket.setAlpha(0);
+        this.bucket.setAlpha(0);
 
         // Initialize the target position
-        this.targetBasketX = this.game.config.width / 2;
+        this.targetbucketX = this.game.config.width / 2;
     }
 
     getRandomBluePeg() {
         const bluePegs = this.obstacles.filter(peg => 
-            peg.active && // Is active (not destroyed)
+            peg.active && // Is not destroyed
             !peg.markedForDeletion && // Not marked for deletion
-            peg.originalColor === '0x1B398F' // Is blue
+            peg.originalcolour === '0x1B398F' // Is blue
         );
         return bluePegs.length > 0 ? Phaser.Utils.Array.GetRandom(bluePegs) : null;
     }
 
     getPurplePeg() {
         return this.obstacles.find(peg => 
-            peg.active && // Is active (not destroyed)
+            peg.active && // Is not destroyed
             !peg.markedForDeletion && // Not marked for deletion
-            peg.originalColor === '0xB714AB' // Is purple
+            peg.originalcolour === '0xB714AB' // Is purple
         );
     }
 
@@ -229,13 +222,13 @@ export class Game extends Phaser.Scene {
         if (oldPurplePeg) {
             // Change old purple peg back to blue
             oldPurplePeg.setFillStyle(0x1B398F);
-            oldPurplePeg.originalColor = '0x1B398F';
+            oldPurplePeg.originalcolour = '0x1B398F';
         }
         
         if (newBluePeg) {
             // Change new blue peg to purple
             newBluePeg.setFillStyle(0xB714AB);
-            newBluePeg.originalColor = '0xB714AB';
+            newBluePeg.originalcolour = '0xB714AB';
         }
     }
 
@@ -249,12 +242,12 @@ export class Game extends Phaser.Scene {
     
             let scoreToAdd = 0; // Score to add based on peg colour
             // Check peg colour and change it based on colour
-            if (obstacle.originalColor === '0xE45837') { // Orange peg
+            if (obstacle.originalcolour === '0xE45837') { // Orange peg
                 obstacle.setFillStyle(0xFEA350);
                 this.orangehit += 1;
                 scoreToAdd = 100;
                 this.scoreText.setText('Score: ' + this.score);
-            } else if (obstacle.originalColor === '0xB714AB') { // Purple peg
+            } else if (obstacle.originalcolour === '0xB714AB') { // Purple peg
                 obstacle.setFillStyle(0xDF74DC);
                 scoreToAdd = 500;
                 this.scoreText.setText('Score: ' + this.score);
@@ -288,11 +281,10 @@ export class Game extends Phaser.Scene {
     
             scoreToAdd *= mult;
                 this.tempScore += scoreToAdd;
-            // Optionally, play a sound or animation here if needed
 
             // Check if all orange pegs are cleared
         const allOrangePegsCleared = !this.obstacles.some(peg => 
-            peg.originalColor === '0xE45837' && !peg.markedForDeletion
+            peg.originalcolour === '0xE45837' && !peg.markedForDeletion
         );
         }
     }
@@ -319,7 +311,7 @@ export class Game extends Phaser.Scene {
         const velocityX = (dx / distance) * 500;  // Speed is 500
         const velocityY = (dy / distance) * 500;
     
-        // Create the ball as a container (similar to spawnItem)
+        // Create the ball as a container
         const ballRadius = 8;
         let container = this.add.container(startX, startY);
         let mainSprite = this.add.sprite(0, 0, 'ball');
@@ -352,20 +344,20 @@ export class Game extends Phaser.Scene {
         // Add the ball to the shotball array
         this.shotball.push(container);
     
-        // Add collision with obstacles (same as spawnItem)
+        // Add collision with obstacles
         this.obstacles.forEach(obstacle => {
             this.physics.add.collider(container, obstacle, this.hitObstacle, null, this);
         });
     
-        // Add overlap with basket
-        this.physics.add.overlap(container, this.basket, this.collectItem, null, this);
+        // Add overlap with bucket
+        this.physics.add.overlap(container, this.bucket, this.collectItem, null, this);
 
         this.shots--;
         this.shotsText.setText('shots: ' + this.shots);
     }
     
-    // Modify the collection logic to remove the current ball when it's collected
-    collectItem(item, basket) {
+    // Remove the current ball when it's collected
+    collectItem(item, bucket) {
         if (item.itemType === 'ball') {
              // Remove the ball from shotball array
             const index = this.shotball.indexOf(item);
@@ -376,20 +368,20 @@ export class Game extends Phaser.Scene {
             // Destroy the ball
             item.destroy();
     
-            // Clear the current ball reference
+            // Clear the current ball
             this.currentBall = null;
 
             this.soundEffects.gainshotAudio.play();
             this.shots++;
             this.shotsText.setText('shots: ' + this.shots);
             const shotGainText = this.add.text(
-                this.basket.x,
-                this.basket.y - 30,
+                this.bucket.x,
+                this.bucket.y - 30,
                 '+1 shot',
                 {
                     fontFamily: 'Arial Black',
                     fontSize: 24,
-                    color: '#00FF00',
+                    colour: '#00FF00',
                     stroke: '#000000',
                     strokeThickness: 4
                 }
@@ -417,13 +409,13 @@ export class Game extends Phaser.Scene {
                     this.shots++;
                     this.shotsText.setText('shots: ' + this.shots);
                     const shotGainText = this.add.text(
-                        this.basket.x,
-                        this.basket.y - 30,
+                        this.bucket.x,
+                        this.bucket.y - 30,
                         '+2 shots',
                         {
                             fontFamily: 'Arial Black',
                             fontSize: 24,
-                            color: '#00FF00',
+                            colour: '#00FF00',
                             stroke: '#000000',
                             strokeThickness: 4
                         }
@@ -440,7 +432,7 @@ export class Game extends Phaser.Scene {
                 this.scoreText.setText('Score: ' + this.score);
                 
                 // Show score popup
-                this.showScorePopup(finalScore, this.basket.x, this.basket.y - 50);
+                this.showScorePopup(finalScore, this.bucket.x, this.bucket.y - 50);
             }
 
             // Reset temp score and counter
@@ -469,31 +461,31 @@ export class Game extends Phaser.Scene {
         const slowSpeed = 5; // Speed the ball slows to
     
         // Calculate the distance to the closest wall
-        const distanceToLeft = this.basket.x;
-        const distanceToRight = this.game.config.width - this.basket.x;
+        const distanceToLeft = this.bucket.x;
+        const distanceToRight = this.game.config.width - this.bucket.x;
         const minDistance = Math.min(distanceToLeft, distanceToRight);
     
         // Gradually adjust speed based on proximity to walls
         if (minDistance < edgeThreshold) {
-            this.basketSpeed = Phaser.Math.Linear(slowSpeed, normalSpeed, minDistance / edgeThreshold);
+            this.bucketSpeed = Phaser.Math.Linear(slowSpeed, normalSpeed, minDistance / edgeThreshold);
         } else {
-            this.basketSpeed = normalSpeed;
+            this.bucketSpeed = normalSpeed;
         }
     
-        // Check if the basket is near the edge and reverse its direction
-        if (this.basket.x <= this.basket.displayWidth / 2 || 
-            this.basket.x >= this.game.config.width - this.basket.displayWidth / 2) {
-            this.basketDirection *= -1;  // Reverse direction when hitting the wall
-            this.basketSpeed = normalSpeed;  // Reset to normal speed when reversing
+        // Check if the bucket is near the edge and reverse its direction
+        if (this.bucket.x <= this.bucket.displayWidth / 2 || 
+            this.bucket.x >= this.game.config.width - this.bucket.displayWidth / 2) {
+            this.bucketDirection *= -1;  // Reverse direction when hitting the wall
+            this.bucketSpeed = normalSpeed;  // Reset to normal speed when reversing
         }
     
-        // Move the basket
-        this.basket.x += this.basketSpeed * this.basketDirection * (delta / 1000);
-        this.basket.body.position.x = this.basket.x - this.basket.width / 2;
+        // Move the bucket
+        this.bucket.x += this.bucketSpeed * this.bucketDirection * (delta / 1000);
+        this.bucket.body.position.x = this.bucket.x - this.bucket.width / 2;
     
-        // Update basket sprite position
-        if (this.basketSprite) {
-            this.basketSprite.x = this.basket.x;
+        // Update bucket sprite position
+        if (this.bucketSprite) {
+            this.bucketSprite.x = this.bucket.x;
         }
 
         // Check for items that have fallen off the bottom of the screen
@@ -523,13 +515,13 @@ export class Game extends Phaser.Scene {
                     this.shotsText.setText('shots: ' + this.shots);
 
                     const shotGainText = this.add.text(
-                        this.basket.x,
-                        this.basket.y - 30,
+                        this.bucket.x,
+                        this.bucket.y - 30,
                         '+1 shot',
                         {
                             fontFamily: 'Arial Black',
                             fontSize: 24,
-                            color: '#00FF00',
+                            colour: '#00FF00',
                             stroke: '#000000',
                             strokeThickness: 4
                         }
@@ -547,7 +539,7 @@ export class Game extends Phaser.Scene {
                 this.scoreText.setText('Score: ' + this.score);
                 
                 // Show score popup
-                this.showScorePopup(finalScore, this.basket.x, this.basket.y - 50);
+                this.showScorePopup(finalScore, this.bucket.x, this.bucket.y - 50);
 
                 if (this.shots === 0) {
                     this.gameOver();
@@ -560,15 +552,15 @@ export class Game extends Phaser.Scene {
                     this.shots++;
                     this.shotsText.setText('shots: ' + this.shots);
                     
-                    // Add visual feedback for gaining a shot
+                    // Add vfx for gaining a shot
                     const shotGainText = this.add.text(
-                        this.basket.x,
-                        this.basket.y - 30,
+                        this.bucket.x,
+                        this.bucket.y - 30,
                         '+1 shot',
                         {
                             fontFamily: 'Arial Black',
                             fontSize: 24,
-                            color: '#00FF00',
+                            colour: '#00FF00',
                             stroke: '#000000',
                             strokeThickness: 4
                         }
@@ -612,7 +604,7 @@ export class Game extends Phaser.Scene {
         const popup = this.add.text(x, y, '+' + score, {
             fontFamily: 'Arial Black',
             fontSize: 24,
-            color: '#ffffff',
+            colour: '#ffffff',
             stroke: '#000000',
             strokeThickness: 4
         }).setOrigin(0.5);
@@ -642,11 +634,11 @@ export class Game extends Phaser.Scene {
         const gameOverText = this.add.text(
             this.game.config.width / 2,
             this.game.config.height / 2,
-            'GAME OVER\n\nTap to restart',
+            'GAME OVER\n\nClick to restart',
             {
                 fontFamily: 'Arial Black',
                 fontSize: 40,
-                color: '#ffffff',
+                colour: '#ffffff',
                 stroke: '#000000',
                 strokeThickness: 8,
                 align: 'center'
@@ -683,11 +675,11 @@ export class Game extends Phaser.Scene {
         const gameWinText = this.add.text(
             this.game.config.width / 2,
             this.game.config.height / 2,
-            'GAME WIN\n\nTap to restart',
+            'GAME WIN\n\nClick to restart',
             {
                 fontFamily: 'Arial Black',
                 fontSize: 40,
-                color: '#ffffff',
+                colour: '#ffffff',
                 stroke: '#000000',
                 strokeThickness: 8,
                 align: 'center'
